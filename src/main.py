@@ -4,12 +4,77 @@ import config
 from clients import notion as nc
 from clients import google_client as gc
 from clients import whatsapp_client as wc
+from clients import filesystem_client as fc
 import llm_agent as agent
+import system_mapper as sm
+import report_generator as rg
 import datetime
 import re
+import os
 
 app = typer.Typer()
 console = Console()
+
+# Create organizer subcommand group
+organizer_app = typer.Typer()
+app.add_typer(organizer_app, name="organizer", help="Commands for filesystem analysis and organization using PARA method.")
+
+@organizer_app.command(name="audit")
+def run_system_audit(
+    output_dir: str = typer.Option(".", "--output", "-o", help="Directory to save the generated reports."),
+    max_depth: int = typer.Option(6, "--depth", "-d", help="Maximum directory depth to scan.")
+):
+    """
+    Scans the filesystem, maps applications, and generates a full PARA-method audit.
+    """
+    console.print("[bold blue]🔍 Starting Igor System Audit...[/bold blue]")
+    
+    try:
+        # Ensure output directory exists
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Step 1: Scan filesystem
+        console.print("\n[bold yellow]📁 Step 1: Scanning filesystem...[/bold yellow]")
+        filesystem_data = fc.scan_filesystem_bfs(max_depth=max_depth)
+        console.print("[green]✓ Filesystem scan completed.[/green]")
+        
+        # Step 2: Map applications
+        console.print("\n[bold yellow]🖥️  Step 2: Mapping system applications...[/bold yellow]")
+        applications_data = sm.map_system_applications()
+        console.print("[green]✓ Application mapping completed.[/green]")
+        
+        # Step 3: Generate reports
+        console.print("\n[bold yellow]📊 Step 3: Generating reports...[/bold yellow]")
+        
+        # Generate all report files
+        database_path = os.path.join(output_dir, "database.json")
+        interactive_map_path = os.path.join(output_dir, "interactive_map.html")
+        editable_map_path = os.path.join(output_dir, "editable_map.md")
+        markdown_report_path = os.path.join(output_dir, "system_report.md")
+        
+        rg.generate_json_database(filesystem_data, applications_data, database_path)
+        rg.generate_interactive_map(filesystem_data, interactive_map_path)
+        rg.generate_editable_map(filesystem_data, editable_map_path)
+        rg.generate_markdown_report(filesystem_data, applications_data, markdown_report_path)
+        
+        console.print("[green]✓ All reports generated successfully.[/green]")
+        
+        # Step 4: Summary
+        console.print(f"\n[bold green]🎉 Igor System Audit Complete![/bold green]")
+        console.print(f"\n[bold]Generated Files:[/bold]")
+        console.print(f"  📄 JSON Database: {database_path}")
+        console.print(f"  🌐 Interactive Map: {interactive_map_path}")
+        console.print(f"  ✏️  Editable Map: {editable_map_path}")
+        console.print(f"  📋 System Report: {markdown_report_path}")
+        
+        console.print(f"\n[bold cyan]💡 Next Steps:[/bold cyan]")
+        console.print(f"  • Open {interactive_map_path} in your browser for interactive exploration")
+        console.print(f"  • Review {markdown_report_path} for PARA method recommendations")
+        console.print(f"  • Use {editable_map_path} in your favorite mind-mapping tool")
+        
+    except Exception as e:
+        console.print(f"[bold red]❌ Audit failed: {e}[/bold red]")
+        raise typer.Exit(1)
 
 @app.command()
 def hello():
