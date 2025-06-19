@@ -1,0 +1,20 @@
+{
+    "getContactInfo": {
+        "avatar": "https://pps.whatsapp.net/v/t61.24694-24/299533077_562036228993657_3716013766942547874_n.jpg?ccb=11-4&oh=01_Q5Aa1wHapVx3zS6-vaO4TG0sTZIcNT3Z8vA5mAVcmVXmtMMzzw&oe=685FD2B5&_nc_sid=5e03e0&_nc_cat=108",
+        "name": "972546781344",
+        "contactName": "אביב ניר צ4",
+        "email": "",
+        "category": "",
+        "description": "",
+        "products": [],
+        "chatId": "972546781344@c.us",
+        "lastSeen": null,
+        "isArchive": false,
+        "isDisappearing": false,
+        "isMute": false,
+        "messageExpiration": 0,
+        "muteExpiration": null,
+        "isBusiness": false
+    },
+    "getChatHistory": null
+}
